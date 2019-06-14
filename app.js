@@ -9,7 +9,7 @@ const addressRoutesV1 = require("./routes/v1/address");
 const bookingRoutesV1 = require("./routes/v1/booking");
 const specialistRoutesV1 = require("./routes/v1/specialist");
 const reviewsRoutesV1 = require("./routes/v1/reviews");
-const reviewsBlackListedJWTV1 = require("./routes/v1/blackListedJWT");
+const reviewsBlackListedJWTV1 = require("./routes/v1/blacklistedJWT");
 const braintreeV1 = require("./routes/v1/braintree");
 
 const port = process.env.PORT || 3000;
