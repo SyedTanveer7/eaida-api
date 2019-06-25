@@ -5,9 +5,17 @@ const BookingSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     },
+    patient: {
+        relation: {
+            type: String
+        },
+        forWho: {
+            type: String
+        }
+    },
     menu: {
         type: String,
-        enum: [ 'Doctor', 'Nurse', 'Therapist', 'Veterinary', 'Laboratory']
+        enum: ['Cadiologist', 'Nurse', 'Physical Therapist', 'Veterinarian', 'Caregiver', 'Dermatologist', 'Ent', 'Family Medicine', 'Gastroenterologist', 'General Practitioner', 'General Surgeon', 'Internal Medicine', 'Medtech', 'Midwife', 'Nephrologist', 'Neurologist', 'Nursing Aid', 'Obstetricts Gynecology', 'Ocupational Medicine', 'Ophthalmologist', 'Orthopedic Surgeon', 'Pediatrician', 'Phlebotomist', 'Psychiatrist', 'Pulmonologist', 'Rehab Med', 'Urologist']
     },
     scheduleDateTime: {
         type: Date
@@ -32,7 +40,7 @@ const BookingSchema = new mongoose.Schema({
         },
         triggeredBy: {
             type: String,
-            enum: [ 'Patient', 'Doctor', 'Nurse', 'Therapist', 'Veterinary', 'Laboratory']
+            enum: ['Patient', 'Cadiologist', 'Nurse', 'Physical Therapist', 'Veterinarian', 'Caregiver', 'Dermatologist', 'Ent', 'Family Medicine', 'Gastroenterologist', 'General Practitioner', 'General Surgeon', 'Internal Medicine', 'Medtech', 'Midwife', 'Nephrologist', 'Neurologist', 'Nursing Aid', 'Obstetricts Gynecology', 'Ocupational Medicine', 'Ophthalmologist', 'Orthopedic Surgeon', 'Pediatrician', 'Phlebotomist', 'Psychiatrist', 'Pulmonologist', 'Rehab Med', 'Urologist']
         },
         specialistCurrentCoordinates: {
             type: String
@@ -41,6 +49,14 @@ const BookingSchema = new mongoose.Schema({
             type: Date
         },
         declineReason: {
+            type: String
+        }
+    },
+    reports: {
+        diagnosis: {
+            type: String
+        },
+        comment: {
             type: String
         }
     },

@@ -43,12 +43,22 @@ const UserSchema = new mongoose.Schema({
     },
 	roles: {
         type: String,
-        enum: ['Patient', 'Doctor', 'Nurse', 'Therapist', 'Veterinary', 'Laboratory'],
+        enum: ['Patient', 'Cadiologist', 'Nurse', 'Physical Therapist', 'Veterinarian', 'Caregiver', 'Dermatologist', 'Ent', 'Family Medicine', 'Gastroenterologist', 'General Practitioner', 'General Surgeon', 'Internal Medicine', 'Medtech', 'Midwife', 'Nephrologist', 'Neurologist', 'Nursing Aid', 'Obstetricts Gynecology', 'Ocupational Medicine', 'Ophthalmologist', 'Orthopedic Surgeon', 'Pediatrician', 'Phlebotomist', 'Psychiatrist', 'Pulmonologist', 'Rehab Med', 'Urologist'],
         default: 'Patient'
     },
     imgURL: {
         type: String,
         trim: true,
+    },
+    identificationImgURL: {
+        passport: {
+            type: String,
+            trim: true,
+        },
+        national: {
+            type: String,
+            trim: true,
+        }
     },
     specialist: {
         info: {
@@ -60,6 +70,8 @@ const UserSchema = new mongoose.Schema({
             default: '0.0'
         }
     },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
     createdAt: {
         type: Date,
         default: Date.now

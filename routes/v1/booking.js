@@ -33,7 +33,7 @@ router.get("/", (req, res) => {
 	}
 	req.query.cancelledAt = {$exists: false};
 	req.query.deleteAt = {$exists: false};
-	Booking.find(req.query).populate('patientID').populate('patientAddressID').populate({path : 'specialistID', populate : {path : 'specialist.info'}}).exec((err, allBooking) => {
+	Booking.find(req.query).populate('patientID').populate('patientAddressID').populate({path : 'specialistID', populate : {path : 'specialist.info'}}).sort({createdAt: -1}).exec((err, allBooking) => {
 		if (err) {
 			res.json({
 				error: true,
@@ -73,6 +73,10 @@ router.post("/", [
 ], (req, res) => {
 	const newBooking = new Booking({
 		patientID: req.body.patientID,
+		patient: {
+			relation: req.body.relation,
+			forWho: req.body.forWho
+		},
 		menu: req.body.menu,
 		scheduleDateTime: moment(req.body.scheduleDateTime).format('MM-DD-YYYY hh:mm:ss'),
 		patientAddressID: req.body.patientAddressID,
@@ -309,6 +313,28 @@ router.put('/location/:id', (req, res) => {
 			res.json({
 				error: false,
 				message: 'Current location sent.'
+			})
+		}
+	})
+});
+
+router.put('/reports/:id', (req, res) => {
+	var updateBookingReports = {
+		reports: {
+			diagnosis: req.body.diagnosis,
+			comment: req.body.comment
+		}
+	};
+	Booking.findByIdAndUpdate(req.params.id, updateBookingReports, (err, cancelBooking) => {
+		if (err) {
+			res.json({
+				error: true,
+				message: err
+			})
+		} else {
+			res.json({
+			error: false,
+			message: 'Booking Cancelled!'
 			})
 		}
 	})

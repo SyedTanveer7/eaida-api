@@ -14,7 +14,7 @@ const braintreeV1 = require("./routes/v1/braintree");
 
 const port = process.env.PORT || 3000;
 
-mongoose.connect("mongodb://eidadev:patrick22@ds157516.mlab.com:57516/eida-dev", {
+mongoose.connect("mongodb://eiadadev:patrick22@ds343127.mlab.com:43127/eiada-dev", {
     useNewUrlParser: true,
     useFindAndModify: false,
     useCreateIndex: true
@@ -27,6 +27,7 @@ app.use(bodyParser.urlencoded({
     limit: '50mb',
     extended: true
 }));
+app.use(express.static(__dirname + "/public"));
 app.use(methodOverride("_method"));
 
 app.use("/api/v1/user", userRoutesV1);
