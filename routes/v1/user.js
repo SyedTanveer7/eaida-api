@@ -227,6 +227,7 @@ router.delete('/:id', (req, res) => {
 	})
 });
 
+
 router.post("/profile-picture", (req, res) => {
 	upload(req, res, (err) => {
 		if (err) {
@@ -255,6 +256,82 @@ router.post("/profile-picture", (req, res) => {
 						res.json({
 							error: false,
 							message: 'Profile picture updated!'
+						})
+					}
+				})
+			}
+		}
+	});
+});
+
+router.post("/identification/general", (req, res) => {
+	upload(req, res, (err) => {
+		if (err) {
+			res.json({
+				error: true,
+				message: err.message
+			})
+			console.log(err);
+		} else {
+			if (req.file == undefined) {
+				res.json({
+					error: true,
+					message: 'No File Selected!'
+				})
+				console.log('No File Selected!');
+			} else {
+				User.findByIdAndUpdate(req.body.userID, {
+					identificationImgURL: {
+						general: req.file.filename
+					} 
+				}, function (err, updatedUser) {
+					if (err) {
+						res.json({
+							error: true,
+							message: err.message
+						})
+					} else {
+						res.json({
+							error: false,
+							message: 'Identification updated!'
+						})
+					}
+				})
+			}
+		}
+	});
+});
+
+router.post("/identification/passport", (req, res) => {
+	upload(req, res, (err) => {
+		if (err) {
+			res.json({
+				error: true,
+				message: err.message
+			})
+			console.log(err);
+		} else {
+			if (req.file == undefined) {
+				res.json({
+					error: true,
+					message: 'No File Selected!'
+				})
+				console.log('No File Selected!');
+			} else {
+				User.findByIdAndUpdate(req.body.userID, {
+					identificationImgURL: {
+						passport: req.file.filename
+					} 
+				}, function (err, updatedUser) {
+					if (err) {
+						res.json({
+							error: true,
+							message: err.message
+						})
+					} else {
+						res.json({
+							error: false,
+							message: 'Identification updated!'
 						})
 					}
 				})

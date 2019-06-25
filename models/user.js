@@ -51,6 +51,10 @@ const UserSchema = new mongoose.Schema({
         trim: true,
     },
     identificationImgURL: {
+        general: {
+            type: String,
+            trim: true,
+        },
         passport: {
             type: String,
             trim: true,
