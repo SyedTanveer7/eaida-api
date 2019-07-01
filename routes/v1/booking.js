@@ -33,7 +33,7 @@ router.get("/", (req, res) => {
 	}
 	req.query.cancelledAt = {$exists: false};
 	req.query.deleteAt = {$exists: false};
-	Booking.find(req.query).populate('patientID').populate('patientAddressID').populate({path : 'specialistID', populate : {path : 'specialist.info'}}).sort({createdAt: -1}).exec((err, allBooking) => {
+	Booking.find(req.query).populate('patientID').populate('patientAddressID').populate('reportID').populate({path : 'specialistID', populate : {path : 'specialist.info'}}).sort({createdAt: -1}).exec((err, allBooking) => {
 		if (err) {
 			res.json({
 				error: true,
@@ -44,6 +44,8 @@ router.get("/", (req, res) => {
 				error: false,
 				message: allBooking
 			})
+
+			console.log(allBooking);
 		}
 	});
 });
@@ -318,14 +320,11 @@ router.put('/location/:id', (req, res) => {
 	})
 });
 
-router.put('/reports/:id', (req, res) => {
+router.put('/report/:id', (req, res) => {
 	var updateBookingReports = {
-		reports: {
-			diagnosis: req.body.diagnosis,
-			comment: req.body.comment
-		}
+		reportID: req.body.reportID
 	};
-	Booking.findByIdAndUpdate(req.params.id, updateBookingReports, (err, cancelBooking) => {
+	Booking.findByIdAndUpdate(req.params.id, updateBookingReports, (err, updatedBooking) => {
 		if (err) {
 			res.json({
 				error: true,
@@ -334,7 +333,7 @@ router.put('/reports/:id', (req, res) => {
 		} else {
 			res.json({
 			error: false,
-			message: 'Booking Cancelled!'
+			message: 'Booking report updated!'
 			})
 		}
 	})

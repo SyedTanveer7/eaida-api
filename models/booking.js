@@ -15,7 +15,7 @@ const BookingSchema = new mongoose.Schema({
     },
     menu: {
         type: String,
-        enum: ['Cadiologist', 'Nurse', 'Physical Therapist', 'Veterinarian', 'Caregiver', 'Dermatologist', 'Ent', 'Family Medicine', 'Gastroenterologist', 'General Practitioner', 'General Surgeon', 'Internal Medicine', 'Medtech', 'Midwife', 'Nephrologist', 'Neurologist', 'Nursing Aid', 'Obstetricts Gynecology', 'Ocupational Medicine', 'Ophthalmologist', 'Orthopedic Surgeon', 'Pediatrician', 'Phlebotomist', 'Psychiatrist', 'Pulmonologist', 'Rehab Med', 'Urologist']
+        enum: ['Cardiologist', 'Nurse', 'Physical Therapist', 'Veterinarian', 'Caregiver', 'Dermatologist', 'Ent', 'Family Medicine', 'Gastroenterologist', 'General Practitioner', 'General Surgeon', 'Internal Medicine', 'Medtech', 'Midwife', 'Nephrologist', 'Neurologist', 'Nursing Aid', 'Obstetricts Gynecology', 'Ocupational Medicine', 'Ophthalmologist', 'Orthopedic Surgeon', 'Pediatrician', 'Phlebotomist', 'Psychiatrist', 'Pulmonologist', 'Rehab Med', 'Urologist']
     },
     scheduleDateTime: {
         type: Date
@@ -40,7 +40,7 @@ const BookingSchema = new mongoose.Schema({
         },
         triggeredBy: {
             type: String,
-            enum: ['Patient', 'Cadiologist', 'Nurse', 'Physical Therapist', 'Veterinarian', 'Caregiver', 'Dermatologist', 'Ent', 'Family Medicine', 'Gastroenterologist', 'General Practitioner', 'General Surgeon', 'Internal Medicine', 'Medtech', 'Midwife', 'Nephrologist', 'Neurologist', 'Nursing Aid', 'Obstetricts Gynecology', 'Ocupational Medicine', 'Ophthalmologist', 'Orthopedic Surgeon', 'Pediatrician', 'Phlebotomist', 'Psychiatrist', 'Pulmonologist', 'Rehab Med', 'Urologist']
+            enum: ['Patient', 'Cardiologist', 'Nurse', 'Physical Therapist', 'Veterinarian', 'Caregiver', 'Dermatologist', 'Ent', 'Family Medicine', 'Gastroenterologist', 'General Practitioner', 'General Surgeon', 'Internal Medicine', 'Medtech', 'Midwife', 'Nephrologist', 'Neurologist', 'Nursing Aid', 'Obstetricts Gynecology', 'Ocupational Medicine', 'Ophthalmologist', 'Orthopedic Surgeon', 'Pediatrician', 'Phlebotomist', 'Psychiatrist', 'Pulmonologist', 'Rehab Med', 'Urologist']
         },
         specialistCurrentCoordinates: {
             type: String
@@ -52,13 +52,9 @@ const BookingSchema = new mongoose.Schema({
             type: String
         }
     },
-    reports: {
-        diagnosis: {
-            type: String
-        },
-        comment: {
-            type: String
-        }
+    reportID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Report"
     },
     createdAt: {
         type: Date,
