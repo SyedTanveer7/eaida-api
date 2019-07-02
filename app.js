@@ -31,6 +31,14 @@ app.use(bodyParser.urlencoded({
 app.use(express.static(__dirname + "/public"));
 app.use(methodOverride("_method"));
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", '*');
+    res.header("Access-Control-Allow-Credentials", true);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
+    next();
+});
+
 app.use("/api/v1/user", userRoutesV1);
 app.use("/api/v1/address", addressRoutesV1);
 app.use("/api/v1/booking", bookingRoutesV1);
