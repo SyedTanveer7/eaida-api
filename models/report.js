@@ -3,18 +3,15 @@ const mongoose = require("mongoose");
 const ReportSchema = new mongoose.Schema({
     patientID: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        unique: true
+        ref: "User"
     },
     specialistID: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        unique: true
+        ref: "User"
     },
     bookingID: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Booking",
-        unique: true
+        ref: "Booking"
     },
     mainComplaint: {
         type: String
