@@ -14,26 +14,9 @@ const middleware = require('../../middleware');
 // BOOKING ENDPOINTS
 
 router.get("/", (req, res) => {
-	// Needs to have userID
-	if(typeof req.query.whichStatus != 'undefined' && req.query.whichStatus != '') {
-		if(req.query.whichStatus == 'declined') {
-			req.query.$and = [ { 'status.label': 'Declined' }, { $or: [ {'status.declineReason': {$exists: false} }, {'status.declineReason': {$exists: true} } ] } ];
-		} else if(req.query.whichStatus == 'approved') {
-			req.query.$and = [ { 'status.label': 'Approved' }, { 'status.declineReason': {$exists: false} } ];
-		} else if(req.query.whichStatus == 'approvedDone') {
-			req.query.$or = [ { 'status.label': 'Approved' }, { 'status.label': 'Done' } ];
-		} else if(req.query.whichStatus == 'completedCancelledDeclined') {
-			req.query.$or = [ { 'status.label': 'Completed' }, { 'status.label': 'Cancelled' }, { 'status.label': 'Declined' } ];
-		} else if(req.query.whichStatus == 'noStatusApprovedDone') {
-			req.query.$or = [ { 'status.label': 'Approved' }, { 'status.label': 'Done' }, { status: {$exists: false} } ];
-		} else if(req.query.whichStatus == 'noStatus') {
-			req.query.status = {$exists: false};
-		}
-		delete req.query.whichStatus;
-	}
-	req.query.cancelledAt = {$exists: false};
 	req.query.deleteAt = {$exists: false};
-	Booking.find(req.query).populate('patientID').populate('patientAddressID').populate('reportID').populate({path : 'specialistID', populate : {path : 'specialist.info'}}).sort({createdAt: -1}).exec((err, allBooking) => {
+	console.log(req.query);
+	Booking.find(req.query).populate('patientID').populate('addressID').populate({path : 'specialistID', populate : {path : 'specialist.info'}}).populate({path : 'specialistID', populate : {path : 'specialist.weeklySchedule'}}).sort({createdAt: -1}).exec((err, allBooking) => {
 		if (err) {
 			res.json({
 				error: true,
@@ -44,14 +27,12 @@ router.get("/", (req, res) => {
 				error: false,
 				message: allBooking
 			})
-
-			console.log(allBooking);
 		}
 	});
 });
 
 router.get("/:id", (req, res) => {
-	Booking.findById(req.params.id).populate('patientID').populate('patientAddressID').populate('specialistID').exec((err, booking) => {
+	Booking.findById(req.params.id).populate('patientID').populate('addressID').populate('specialistID').exec((err, booking) => {
 		if (err) {
 			res.json({
 				error: true,
@@ -67,24 +48,52 @@ router.get("/:id", (req, res) => {
 });
 
 router.post("/", [
-	check('patientID', 'Patientt is required.').not().isEmpty(),
-	check('menu', 'Menu is required.').not().isEmpty(),
-	check('scheduleDateTime', 'Date is required.').not().isEmpty(),
-	check('patientAddressID', 'Your Address is required.').not().isEmpty(),
-	check('specialistID', 'Specialist is required.').not().isEmpty()
+	check('patientID', 'Patient is required.').not().isEmpty(),
+	check('accountOwnerName', 'Owner Name is required.').not().isEmpty(),
+	check('bookingReason', 'Booking Reason is required.').not().isEmpty(),
+	check('patientType', 'Patient Type is required.').not().isEmpty(),
+	check('patientName', 'Patient Name is required.').not().isEmpty(),
+	check('addressID', 'Address ID is required.').not().isEmpty(),
+	check('addressTitle', 'Address Title is required.').not().isEmpty(),
+	check('caseName', 'Case Name is required.').not().isEmpty(),
+	check('caseCategory', 'Case Category is required.').not().isEmpty(),
+	check('specialistID', 'Specialist ID is required.').not().isEmpty(),
+	check('specialistName', 'Specialist Name is required.').not().isEmpty(),
+	check('bookingDate', 'Booking Date is required.').not().isEmpty()
 ], (req, res) => {
+
+	var forWho1 = "";
+	var forWho2 = "";
+
+	if(req.body.patientType != "Myself") {
+		forWho1 = " for your " + req.body.patientType;
+		forWho2 = " for his/her " + req.body.patientType;
+	}
+
 	const newBooking = new Booking({
 		patientID: req.body.patientID,
-		patient: {
-			relation: req.body.relation,
-			forWho: req.body.forWho
-		},
-		menu: req.body.menu,
-		scheduleDateTime: moment(req.body.scheduleDateTime).format('MM-DD-YYYY hh:mm:ss'),
-		patientAddressID: req.body.patientAddressID,
+		bookingReason: req.body.bookingReason,
+		patientType: req.body.patientType,
+		familyMemberID: req.body.familyMemberID,
+		addressID: req.body.addressID,
+		addressTitle: req.body.addressTitle,
+		caseName: req.body.caseName,
+		caseCategory: req.body.caseCategory,
 		specialistID: req.body.specialistID,
-		payment: {
-			refID: req.body.payment
+		bookingDate: moment(req.body.bookingDate).format('MM-DD-YYYY hh:mm:ss'),
+		scenario: {
+			message1: {
+				code: "1",
+				description_patient: "You booked " + req.body.specialistName + " on " + moment(req.body.bookingDate).format('MMMM DD') + forWho1 + " because of " + req.body.bookingReason + ".",
+				description_specialist: req.body.accountOwnerName + " is asking for booking on " + moment(req.body.bookingDate).format('MMMM DD') + forWho2 + " because of " + req.body.bookingReason + ".",
+				trigger: "Patient",
+				createdAt: moment()	
+			}
+		},
+		specialistLocation: {
+			lat: "14.364938",
+			lng: "121.480514",
+			createdAt: moment()
 		}
 	});
 
@@ -119,20 +128,27 @@ router.post("/", [
 
 router.put('/:id', [
 	check('patientID', 'Patient is required.').not().isEmpty(),
-	check('menu', 'Menu is required.').not().isEmpty(),
-	check('scheduleDateTime', 'Date is required.').not().isEmpty(),
-	check('patientAddressID', 'Your Address is required.').not().isEmpty(),
-	check('specialistID', 'Specialist is required.').not().isEmpty()
+	check('bookingReason', 'Booking Reason is required.').not().isEmpty(),
+	check('patientType', 'Patient Type is required.').not().isEmpty(),
+	check('patientLastName', 'Patient Type is required.').not().isEmpty(),
+	check('addressID', 'Address ID is required.').not().isEmpty(),
+	check('addressTitle', 'Address Title is required.').not().isEmpty(),
+	check('caseName', 'Case Name is required.').not().isEmpty(),
+	check('caseCategory', 'Case Category is required.').not().isEmpty(),
+	check('specialistID', 'Specialist ID is required.').not().isEmpty(),
+	check('specialistLastName', 'Specialist Last Name is required.').not().isEmpty(),
+	check('bookingDate', 'Booking Date is required.').not().isEmpty()
 ], (req, res) => {
 	var updateBooking = {
-		patientID: req.body.patientID,
-		menu: req.body.menu,
-		scheduleDateTime: moment(req.body.scheduleDateTime).format('MM-DD-YYYY hh:mm'),
-		patientAddressID: req.body.patientAddressID,
+		bookingReason: req.body.bookingReason,
+		patientType: req.body.patientType,
+		familyMemberID: req.body.familyMemberID,
+		addressID: req.body.addressID,
+		addressTitle: req.body.addressTitle,
+		caseName: req.body.caseName,
+		caseCategory: req.body.caseCategory,
 		specialistID: req.body.specialistID,
-		payment: {
-			refID: req.body.payment
-		}
+		bookingDate: moment(req.body.bookingDate).format('MM-DD-YYYY hh:mm:ss')
 	};
 	var errorsMessage = '';
 	var errors = validationResult(req);
@@ -334,6 +350,260 @@ router.put('/report/:id', (req, res) => {
 			res.json({
 			error: false,
 			message: 'Booking report updated!'
+			})
+		}
+	})
+});
+
+router.put('/scenario/:id', (req, res) => {
+
+	var updateBooking = {};
+
+	var notificationFor;
+
+	if(req.body.trigger == "Patient") {
+		notificationFor = "Specialist";
+	} else if(req.body.trigger == "Specialist") {
+		notificationFor = "Patient";
+	}
+
+	if(req.body.sequenceNumber == "1") {
+		updateBooking = { 
+			$set: {
+				notification: notificationFor,
+				'scenario.message1': {
+					code: req.body.code,
+					description_patient: req.body.descriptionPatient,
+					description_specialist: req.body.descriptionSpecialist,
+					trigger: req.body.trigger,
+					createdAt: moment()
+				}
+			}
+		};
+	} else if(req.body.sequenceNumber == "2") {
+		updateBooking = {
+			$set: {
+				notification: notificationFor,
+				'scenario.message2': {
+					code: req.body.code,
+					description_patient: req.body.descriptionPatient,
+					description_specialist: req.body.descriptionSpecialist,
+					trigger: req.body.trigger,
+					createdAt: moment()
+				}
+			}
+		};
+	} else if(req.body.sequenceNumber == "3") {
+		updateBooking = {
+			$set: {
+				notification: notificationFor,
+				'scenario.message3': {
+					code: req.body.code,
+					description_patient: req.body.descriptionPatient,
+					description_specialist: req.body.descriptionSpecialist,
+					trigger: req.body.trigger,
+					createdAt: moment()
+				}
+			}
+		};
+	} else if(req.body.sequenceNumber == "4") {
+		updateBooking = {
+			$set: {
+				notification: notificationFor,
+				'scenario.message4': {
+					code: req.body.code,
+					description_patient: req.body.descriptionPatient,
+					description_specialist: req.body.descriptionSpecialist,
+					trigger: req.body.trigger,
+					createdAt: moment()
+				}
+			}
+		};
+	} else if(req.body.sequenceNumber == "5") {
+		updateBooking = {
+			$set: {
+				notification: notificationFor,
+				'scenario.message5': {
+					code: req.body.code,
+					description_patient: req.body.descriptionPatient,
+					description_specialist: req.body.descriptionSpecialist,
+					trigger: req.body.trigger,
+					createdAt: moment()
+				}
+			}
+		};
+	} else if(req.body.sequenceNumber == "6") {
+		updateBooking = {
+			$set: {
+				notification: notificationFor,
+				'scenario.message6': {
+					code: req.body.code,
+					description_patient: req.body.descriptionPatient,
+					description_specialist: req.body.descriptionSpecialist,
+					trigger: req.body.trigger,
+					createdAt: moment()
+				}
+			}
+		};
+	} else if(req.body.sequenceNumber == "7") {
+		updateBooking = {
+			$set: {
+				notification: notificationFor,
+				'scenario.message7': {
+					code: req.body.code,
+					description_patient: req.body.descriptionPatient,
+					description_specialist: req.body.descriptionSpecialist,
+					trigger: req.body.trigger,
+					createdAt: moment()
+				}
+			}
+		};
+	} else if(req.body.sequenceNumber == "8") {
+		updateBooking = {
+			$set: {
+				notification: notificationFor,
+				'scenario.message8': {
+					code: req.body.code,
+					description_patient: req.body.descriptionPatient,
+					description_specialist: req.body.descriptionSpecialist,
+					trigger: req.body.trigger,
+					createdAt: moment()
+				}
+			}
+		};
+	} else if(req.body.sequenceNumber == "9") {
+		updateBooking = {
+			$set: {
+				notification: notificationFor,
+				'scenario.message9': {
+					code: req.body.code,
+					description_patient: req.body.descriptionPatient,
+					description_specialist: req.body.descriptionSpecialist,
+					trigger: req.body.trigger,
+					createdAt: moment()
+				}
+			}
+		};
+	} else if(req.body.sequenceNumber == "10") {
+		updateBooking = {
+			$set: {
+				notification: notificationFor,
+				'scenario.message10': {
+					code: req.body.code,
+					description_patient: req.body.descriptionPatient,
+					description_specialist: req.body.descriptionSpecialist,
+					trigger: req.body.trigger,
+					createdAt: moment()
+				}
+			}
+		};
+	} else if(req.body.sequenceNumber == "11") {
+		updateBooking = {
+			$set: {
+				notification: notificationFor,
+				'scenario.message11': {
+					code: req.body.code,
+					description_patient: req.body.descriptionPatient,
+					description_specialist: req.body.descriptionSpecialist,
+					trigger: req.body.trigger,
+					createdAt: moment()
+				}
+			}
+		};
+	} else if(req.body.sequenceNumber == "12") {
+		updateBooking = {
+			$set: {
+				notification: notificationFor,
+				'scenario.message12': {
+					code: req.body.code,
+					description_patient: req.body.descriptionPatient,
+					description_specialist: req.body.descriptionSpecialist,
+					trigger: req.body.trigger,
+					createdAt: moment()
+				}
+			}
+		};
+	}
+
+	Booking.update({ _id: req.params.id}, updateBooking, (err, updatedBooking) => {
+		if (err) {
+			res.json({
+				error: true,
+				message: err
+			})
+		} else {
+			res.json({
+			error: false,
+			message: 'Booking updated!'
+			})
+			console.log(updatedBooking);
+		}
+	})
+});
+
+router.put('/payment/:id', (req, res) => {
+	var updateBooking = {
+		payment: {
+			chargeID: req.body.chargeID,
+			createdAt: moment()
+		}
+	};
+	Booking.update({ _id: req.params.id}, updateBooking, (err, updatedBooking) => {
+		if (err) {
+			res.json({
+				error: true,
+				message: err
+			})
+		} else {
+			res.json({
+			error: false,
+			message: 'Booking payment updated!'
+			})
+			console.log(updatedBooking);
+		}
+	})
+});
+
+router.put('/location/:id', (req, res) => {
+	var updateBooking = {
+		specialistLocation: {
+			lat: req.body.lat,
+			lng: req.body.lng,
+			createdAt: moment()
+		}
+	};
+	Booking.update({ _id: req.params.id}, updateBooking, (err, updatedBooking) => {
+		if (err) {
+			res.json({
+				error: true,
+				message: err
+			})
+		} else {
+			res.json({
+			error: false,
+			message: 'Booking specialist location updated!'
+			})
+			console.log(updatedBooking);
+		}
+	})
+});
+
+router.put('/notification/:id', (req, res) => {
+	var updateBooking = {
+		notification: {
+			for: req.body.notification
+		}
+	};
+	Booking.update({ _id: req.params.id }, updateBooking, (err, updatedBooking) => {
+		if (err) {
+			res.json({
+				error: true,
+				message: err
+			})
+		} else {
+			res.json({
+			error: false,
+			message: 'Notification has been seen.'
 			})
 		}
 	})

@@ -13,27 +13,31 @@ const AddressSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
-	addressLine1: {
+	area: {
         type: String,
         trim: true
     },
-    addressLine2: {
+    address: {
         type: String,
         trim: true
     },
-    cityTown: {
+    street: {
         type: String,
         trim: true
     },
-    stateProvinceRegion: {
+    building: {
         type: String,
         trim: true
     },
-    zipPostalCode: {
+    floor: {
         type: String,
         trim: true
     },
-    country: {
+    additionalDirection: {
+        type: String,
+        trim: true
+    },
+    mobileNumber: {
         type: String,
         trim: true
     },

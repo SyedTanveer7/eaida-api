@@ -54,7 +54,11 @@ router.post("/", [
 	check('consultationFee', 'Patientt is required.').not().isEmpty(),
 	check('university', 'Menu is required.').not().isEmpty(),
 	check('associatedHospital', 'Date is required.').not().isEmpty(),
-	check('experience', 'Time is required.').not().isEmpty()
+	check('experience', 'Experience is required.').not().isEmpty(),
+	check('nameTitle', 'Name Title is required.').not().isEmpty(),
+	check('licenseNumber', 'License Number is required.').not().isEmpty(),
+	check('about', 'About is required.').not().isEmpty(),
+	check('languages', 'Languages is required.').not().isEmpty()
 ], (req, res) => {
 	const newSpecialist = new Specialist({
         // Needs to have userID
@@ -62,7 +66,11 @@ router.post("/", [
 		consultationFee: req.body.consultationFee,
 		university: req.body.university,
 		associatedHospital: req.body.associatedHospital,
-		experience: req.body.experience
+		experience: req.body.experience,
+		nameTitle: req.body.nameTitle,
+		licenseNumber: req.body.licenseNumber,
+		about: req.body.about,
+		languages: req.body.languages
 	});
 
 	var errorsMessage = '';
@@ -104,16 +112,26 @@ router.post("/", [
 });
 
 router.put('/:id', [
+	check('userID', 'User ID is required.').not().isEmpty(),
 	check('consultationFee', 'Patientt is required.').not().isEmpty(),
 	check('university', 'Menu is required.').not().isEmpty(),
 	check('associatedHospital', 'Date is required.').not().isEmpty(),
-	check('experience', 'Time is required.').not().isEmpty()
+	check('experience', 'Experience is required.').not().isEmpty(),
+	check('nameTitle', 'Name Title is required.').not().isEmpty(),
+	check('licenseNumber', 'License Number is required.').not().isEmpty(),
+	check('about', 'About is required.').not().isEmpty(),
+	check('languages', 'Languages is required.').not().isEmpty()
 ], (req, res) => {
 	var updateSpecialist = {
+        userID: req.body.userID,
 		consultationFee: req.body.consultationFee,
 		university: req.body.university,
 		associatedHospital: req.body.associatedHospital,
-		experience: req.body.experience
+		experience: req.body.experience,
+		nameTitle: req.body.nameTitle,
+		licenseNumber: req.body.licenseNumber,
+		about: req.body.about,
+		languages: req.body.languages
 	};
 	var errorsMessage = '';
 	var errors = validationResult(req);

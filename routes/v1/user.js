@@ -81,9 +81,7 @@ router.get("/", (req, res) => {
 	req.query.deleteAt = {
 		$exists: false
 	};
-	User.find(req.query).populate({
-		path: 'specialist.info'
-	}).exec((err, allUser) => {
+	User.find(req.query).populate({ path: 'specialist.info' }).populate({ path: 'specialist.weeklySchedule' }).exec((err, allUser) => {
 		if (err) {
 			res.json({
 				error: true,
@@ -123,6 +121,8 @@ router.post("/", [
 	check('firstName', 'First name is required.').not().isEmpty(),
 	check('lastName', 'Last name is required.').not().isEmpty(),
 	check('middleName', 'Middle name is required.').not().isEmpty(),
+	check('gender', 'Gender is required.').not().isEmpty(),
+	check('birthDate', 'Birth Date is required.').not().isEmpty(),
 	check('roles', 'Role is required.').not().isEmpty()
 ], (req, res) => {
 	const newUser = new User({
@@ -132,6 +132,8 @@ router.post("/", [
 		firstName: req.body.firstName,
 		lastName: req.body.lastName,
 		middleName: req.body.middleName,
+		gender: req.body.gender,
+		birthDate: moment(req.body.birthDate).format('MM-DD-YYYY hh:mm:ss'),
 		roles: req.body.roles
 	});
 
@@ -170,6 +172,8 @@ router.put('/:id', [
 	check('email', 'Email is required.').not().isEmpty(),
 	check('firstName', 'First name is required.').not().isEmpty(),
 	check('lastName', 'Last name is required.').not().isEmpty(),
+	check('gender', 'Gender is required.').not().isEmpty(),
+	check('birthDate', 'Birth Date is required.').not().isEmpty(),
 	check('middleName', 'Middle name is required.').not().isEmpty()
 ], (req, res) => {
 	var updateUser = {
@@ -178,6 +182,8 @@ router.put('/:id', [
 		email: req.body.email,
 		firstName: req.body.firstName,
 		lastName: req.body.lastName,
+		gender: req.body.gender,
+		birthDate: moment(req.body.birthDate).format('MM-DD-YYYY hh:mm:ss'),
 		middleName: req.body.middleName
 	};
 	var errorsMessage = '';
@@ -264,7 +270,7 @@ router.post("/profile-picture", (req, res) => {
 	});
 });
 
-router.post("/identification/general", (req, res) => {
+router.post("/identification", (req, res) => {
 	upload(req, res, (err) => {
 		if (err) {
 			res.json({
@@ -280,11 +286,30 @@ router.post("/identification/general", (req, res) => {
 				})
 				console.log('No File Selected!');
 			} else {
-				User.findByIdAndUpdate(req.body.userID, {
-					identificationImgURL: {
-						general: req.file.filename
-					} 
-				}, function (err, updatedUser) {
+				var docuType;
+				if(req.body.docuType == "passport") {
+					docuType = {
+						'identification.passport': {
+							url: req.file.filename,
+							number: req.body.idNumber,
+						}
+					}
+				} else if(req.body.docuType == "emirates") {
+					docuType = {
+						'identification.emirates': {
+							url: req.file.filename,
+							number: req.body.idNumber,
+						}
+					}
+				} else if(req.body.docuType == "insurance") {
+					docuType = {
+						'identification.insurance': {
+							url: req.file.filename,
+							number: req.body.idNumber,
+						}
+					}
+				}
+				User.findByIdAndUpdate(req.body.userID, {$set: docuType}, function (err, updatedUser) {
 					if (err) {
 						res.json({
 							error: true,
@@ -302,42 +327,60 @@ router.post("/identification/general", (req, res) => {
 	});
 });
 
-router.post("/identification/passport", (req, res) => {
-	upload(req, res, (err) => {
-		if (err) {
-			res.json({
-				error: true,
-				message: err.message
-			})
-			console.log(err);
-		} else {
-			if (req.file == undefined) {
-				res.json({
-					error: true,
-					message: 'No File Selected!'
-				})
-				console.log('No File Selected!');
-			} else {
-				User.findByIdAndUpdate(req.body.userID, {
-					identificationImgURL: {
-						passport: req.file.filename
-					} 
-				}, function (err, updatedUser) {
-					if (err) {
-						res.json({
-							error: true,
-							message: err.message
-						})
-					} else {
-						res.json({
-							error: false,
-							message: 'Identification updated!'
-						})
-					}
-				})
+router.put('/id-number/:id', [
+	check('idNumber', 'ID Number is required.').not().isEmpty(),
+	check('docuType', 'Document Type is required.').not().isEmpty()
+], (req, res) => {
+	var updateUser = {
+		username: req.body.username,
+		password: req.body.password,
+		email: req.body.email,
+		firstName: req.body.firstName,
+		lastName: req.body.lastName,
+		gender: req.body.gender,
+		birthDate: moment(req.body.birthDate).format('MM-DD-YYYY hh:mm:ss'),
+		middleName: req.body.middleName
+	};
+	var errorsMessage = '';
+	var errors = validationResult(req);
+	var errorsArray = errors.array();
+	for (var i = 0; i < errorsArray.length; i++) {
+		errorsMessage += JSON.parse(JSON.stringify(errorsArray[i].msg)) + '<br />';
+	}
+	if (errorsArray.length > 0) {
+		res.json({
+			error: true,
+			message: errorsMessage
+		})
+	} else {
+		var docuType;
+		if(req.body.docuType == "passport") {
+			docuType = {
+				'identification.passport.number': req.body.idNumber
+			}
+		} else if(req.body.docuType == "emirates") {
+			docuType = {
+				'identification.emirates.number': req.body.idNumber
+			}
+		} else if(req.body.docuType == "insurance") {
+			docuType = {
+				'identification.insurance.number': req.body.idNumber
 			}
 		}
-	});
+		User.findByIdAndUpdate(req.params.id, {$set: docuType}, function (err, updatedUser) {
+			if (err) {
+				res.json({
+					error: true,
+					message: err.message
+				})
+			} else {
+				res.json({
+					error: false,
+					message: 'Identification updated!'
+				})
+			}
+		})
+	}
 });
 
 router.post("/identification/passport", (req, res) => {
@@ -573,10 +616,7 @@ router.post('/change-password', function (req, res) {
 const storage = multer.diskStorage({
 	destination: './public/uploads/',
 	filename: function (req, file, cb) {
-		cb(
-			null,
-			file.fieldname + '-' + Date.now() + path.extname(file.originalname)
-		);
+		cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname) );
 	}
 });
 

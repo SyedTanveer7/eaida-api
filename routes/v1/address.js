@@ -52,24 +52,28 @@ router.get("/:id", (req, res) => {
 });
 
 router.post("/", [
+	check('userID', 'User ID is required.').not().isEmpty(),
 	check('title', 'Title is required.').not().isEmpty(),
 	check('coordinates', 'Coordinates is required.').not().isEmpty(),
-	check('addressLine1', 'Address Line 1 is required.').not().isEmpty(),
-	check('cityTown', 'City/Town is required.').not().isEmpty(),
-	check('stateProvinceRegion', 'State/Province/Region is required.').not().isEmpty(),
-	check('zipPostalCode', 'Zip/Postal Code is required.').not().isEmpty(),
-	check('country', 'Code is required.').not().isEmpty()
+	check('area', 'Area Line 1 is required.').not().isEmpty(),
+	check('address', 'Address is required.').not().isEmpty(),
+	check('street', 'Street is required.').not().isEmpty(),
+	check('building', 'Building is required.').not().isEmpty(),
+	check('floor', 'Floor is required.').not().isEmpty(),
+	check('additionalDirection', 'Additional Directions is required.').not().isEmpty(),
+	check('mobileNumber', 'Mobile Number is required.').not().isEmpty()
 ], (req, res) => {
 	const newAddress = new Address({
 		userID: req.body.userID,
 		title: req.body.title,
 		coordinates: req.body.coordinates,
-		addressLine1: req.body.addressLine1,
-		addressLine2: req.body.addressLine2,
-		cityTown: req.body.cityTown,
-		stateProvinceRegion: req.body.stateProvinceRegion,
-		zipPostalCode: req.body.zipPostalCode,
-		country: req.body.country
+		area: req.body.area,
+		address: req.body.address,
+		street: req.body.street,
+		building: req.body.building,
+		floor: req.body.floor,
+		additionalDirection: req.body.additionalDirection,
+		mobileNumber: req.body.mobileNumber
 	});
 
 	var errorsMessage = '';
@@ -104,21 +108,24 @@ router.post("/", [
 router.put('/:id', [
 	check('title', 'Title is required.').not().isEmpty(),
 	check('coordinates', 'Coordinates is required.').not().isEmpty(),
-	check('addressLine1', 'Address Line 1 is required.').not().isEmpty(),
-	check('cityTown', 'City/Town is required.').not().isEmpty(),
-	check('stateProvinceRegion', 'State/Province/Region is required.').not().isEmpty(),
-	check('zipPostalCode', 'Zip/Postal Code is required.').not().isEmpty(),
-	check('country', 'Code is required.').not().isEmpty()
+	check('area', 'Area Line 1 is required.').not().isEmpty(),
+	check('address', 'Address is required.').not().isEmpty(),
+	check('street', 'Street is required.').not().isEmpty(),
+	check('building', 'Building is required.').not().isEmpty(),
+	check('floor', 'Floor is required.').not().isEmpty(),
+	check('additionalDirection', 'Additional Directions is required.').not().isEmpty(),
+	check('mobileNumber', 'Mobile Number is required.').not().isEmpty()
 ], (req, res) => {
 	var updateAddress = {
 		title: req.body.title,
 		coordinates: req.body.coordinates,
-		addressLine1: req.body.addressLine1,
-		addressLine2: req.body.addressLine2,
-		cityTown: req.body.cityTown,
-		stateProvinceRegion: req.body.stateProvinceRegion,
-		zipPostalCode: req.body.zipPostalCode,
-		country: req.body.country
+		area: req.body.area,
+		address: req.body.address,
+		street: req.body.street,
+		building: req.body.building,
+		floor: req.body.floor,
+		additionalDirection: req.body.additionalDirection,
+		mobileNumber: req.body.mobileNumber
 	};
 	var errorsMessage = '';
 	var errors = validationResult(req);

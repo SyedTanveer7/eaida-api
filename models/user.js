@@ -41,6 +41,13 @@ const UserSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    gender: {
+        type: String,
+        enum: ['Male', 'Female']
+    },
+    birthDate: {
+        type: Date
+    },
 	roles: {
         type: String,
         enum: ['Patient', 'Cardiologist', 'Nurse', 'Physical Therapist', 'Veterinarian', 'Caregiver', 'Dermatologist', 'Ent', 'Family Medicine', 'Gastroenterologist', 'General Practitioner', 'General Surgeon', 'Internal Medicine', 'Medtech', 'Midwife', 'Nephrologist', 'Neurologist', 'Nursing Aid', 'Obstetricts Gynecology', 'Ocupational Medicine', 'Ophthalmologist', 'Orthopedic Surgeon', 'Pediatrician', 'Phlebotomist', 'Psychiatrist', 'Pulmonologist', 'Rehab Med', 'Urologist'],
@@ -50,24 +57,46 @@ const UserSchema = new mongoose.Schema({
         type: String,
         trim: true,
     },
-    identificationImgURL: {
-        general: {
-            type: String,
-            trim: true,
-        },
+    identification: {
         passport: {
-            type: String,
-            trim: true,
+            url: {
+                type: String,
+                trim: true,
+            },
+            number: {
+                type: String,
+                trim: true,
+            }
         },
-        national: {
-            type: String,
-            trim: true,
+        emirates: {
+            url: {
+                type: String,
+                trim: true,
+            },
+            number: {
+                type: String,
+                trim: true,
+            }
+        },
+        insurance: {
+            url: {
+                type: String,
+                trim: true,
+            },
+            number: {
+                type: String,
+                trim: true,
+            }
         }
     },
     specialist: {
         info: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Specialist"
+        },
+        weeklySchedule: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "SpecialistWeeklySchedule"
         },
         reviewStarCount: {
             type: String,

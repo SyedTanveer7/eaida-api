@@ -18,6 +18,18 @@ const SpecialistSchema = new mongoose.Schema({
     experience: {
         type: String
     },
+    nameTitle: {
+        type: String
+    },
+    licenseNumber: {
+        type: String
+    },
+    about: {
+        type: String
+    },
+    languages: {
+        type: String
+    },
     createdAt: {
         type: Date,
         default: Date.now

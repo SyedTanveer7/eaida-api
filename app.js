@@ -12,6 +12,12 @@ const reviewsRoutesV1 = require("./routes/v1/reviews");
 const reviewsBlackListedJWTV1 = require("./routes/v1/blacklistedJWT");
 const braintreeV1 = require("./routes/v1/braintree");
 const reportRoutesV1 = require("./routes/v1/report");
+const caseRoutesV1 = require("./routes/v1/case");
+const specialistExpertiseRoutesV1 = require("./routes/v1/specialistExpertise");
+const familyMemberRoutesV1 = require("./routes/v1/familyMember");
+const specialistWeeklyScheduleRoutesV1 = require("./routes/v1/specialistWeeklySchedule");
+const cardDetailsRoutesV1 = require("./routes/v1/cardDetails");
+const stripeRoutesV1 = require("./routes/v1/stripe");
 
 const port = process.env.PORT || 3000;
 
@@ -47,6 +53,12 @@ app.use("/api/v1/reviews", reviewsRoutesV1);
 app.use("/api/v1/blacklistedjwt", reviewsBlackListedJWTV1);
 app.use("/api/v1/braintree", braintreeV1);
 app.use("/api/v1/report", reportRoutesV1);
+app.use("/api/v1/case", caseRoutesV1);
+app.use("/api/v1/specialistexpertise", specialistExpertiseRoutesV1);
+app.use("/api/v1/familymember", familyMemberRoutesV1);
+app.use("/api/v1/specialistweeklyschedule", specialistWeeklyScheduleRoutesV1);
+app.use("/api/v1/carddetails", cardDetailsRoutesV1);
+app.use("/api/v1/stripe", stripeRoutesV1);
 
 app.get('*', (req, res) => {
     res.status(404).send("You don't have any permission to access this.");
