@@ -327,6 +327,41 @@ router.post("/identification", (req, res) => {
 	});
 });
 
+router.put('/change-password/:id', [
+	check('password', 'Password is required.').not().isEmpty()
+], (req, res) => {
+	var updateUser = {
+		password: req.body.password
+	};
+	var errorsMessage = '';
+	var errors = validationResult(req);
+	var errorsArray = errors.array();
+	for (var i = 0; i < errorsArray.length; i++) {
+		errorsMessage += JSON.parse(JSON.stringify(errorsArray[i].msg)) + '<br />';
+	}
+	if (errorsArray.length > 0) {
+		res.json({
+			error: true,
+			message: errorsMessage
+		})
+	} else {
+		User.findByIdAndUpdate(req.params.id, updateUser, function (err, updatedUser) {
+			if (err) {
+				res.json({
+					error: true,
+					message: err.message
+				})
+			} else {
+				res.json({
+					error: false,
+					message: 'Password updated!'
+				})
+			}
+		})
+	}
+});
+
+
 router.put('/id-number/:id', [
 	check('idNumber', 'ID Number is required.').not().isEmpty(),
 	check('docuType', 'Document Type is required.').not().isEmpty()
