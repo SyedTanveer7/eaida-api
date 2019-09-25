@@ -86,7 +86,8 @@ router.post("/", [
 			} else {
 				res.json({
 					error: false,
-					message: 'Successfully added new Review!'
+					message: 'Successfully added new Review!',
+					reviewID: reviews._id
 				})
 			}
 		})

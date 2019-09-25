@@ -64,6 +64,14 @@ const BookingSchema = new mongoose.Schema({
         },
         message: String
     },
+    reportID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Report"
+    },
+    reviewID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review"
+    },
     scenario: {
         message1: {
             code: {

@@ -81,6 +81,10 @@ router.post("/", [
 		caseCategory: req.body.caseCategory,
 		specialistID: req.body.specialistID,
 		bookingDate: moment(req.body.bookingDate).format('MM-DD-YYYY hh:mm:ss'),
+		notification: {
+			for: "Specialist",
+			message: "You have new booking request from " + req.body.accountOwnerName + "."
+		},
 		scenario: {
 			message1: {
 				code: "1",
@@ -89,11 +93,6 @@ router.post("/", [
 				trigger: "Patient",
 				createdAt: moment()	
 			}
-		},
-		specialistLocation: {
-			lat: "14.364938",
-			lng: "121.480514",
-			createdAt: moment()
 		}
 	});
 
@@ -316,12 +315,14 @@ router.put('/complete/:id', (req, res) => {
 });
 
 router.put('/location/:id', (req, res) => {
-	var acceptBooking = {
+	var location = {
 		$set: { 
-			'status.specialistCurrentCoordinates':req.body.coordinates       
+			'specialistLocation.lat': req.body.lat,
+			'specialistLocation.lng': req.body.lng,
+			createdAt: moment() 
 		 }
 	};
-	Booking.findByIdAndUpdate(req.params.id, acceptBooking, (err, updateLocation) => {
+	Booking.findByIdAndUpdate(req.params.id, location, (err, updateLocation) => {
 		if (err) {
 			res.json({
 				error: true,
@@ -330,7 +331,7 @@ router.put('/location/:id', (req, res) => {
 		} else {
 			res.json({
 				error: false,
-				message: 'Current location sent.'
+				message: 'Current location has been shared.'
 			})
 		}
 	})
@@ -341,6 +342,25 @@ router.put('/report/:id', (req, res) => {
 		reportID: req.body.reportID
 	};
 	Booking.findByIdAndUpdate(req.params.id, updateBookingReports, (err, updatedBooking) => {
+		if (err) {
+			res.json({
+				error: true,
+				message: err
+			})
+		} else {
+			res.json({
+			error: false,
+			message: 'Booking report updated!'
+			})
+		}
+	})
+});
+
+router.put('/review/:id', (req, res) => {
+	var updateBookingReviews = {
+		reviewID: req.body.reviewID
+	};
+	Booking.findByIdAndUpdate(req.params.id, updateBookingReviews, (err, updatedBooking) => {
 		if (err) {
 			res.json({
 				error: true,
@@ -370,7 +390,10 @@ router.put('/scenario/:id', (req, res) => {
 	if(req.body.sequenceNumber == "1") {
 		updateBooking = { 
 			$set: {
-				notification: notificationFor,
+				notification: {
+					for: notificationFor,
+					message: req.body.notificationMessage
+				},
 				'scenario.message1': {
 					code: req.body.code,
 					description_patient: req.body.descriptionPatient,
@@ -383,7 +406,10 @@ router.put('/scenario/:id', (req, res) => {
 	} else if(req.body.sequenceNumber == "2") {
 		updateBooking = {
 			$set: {
-				notification: notificationFor,
+				notification: {
+					for: notificationFor,
+					message: req.body.notificationMessage
+				},
 				'scenario.message2': {
 					code: req.body.code,
 					description_patient: req.body.descriptionPatient,
@@ -396,7 +422,10 @@ router.put('/scenario/:id', (req, res) => {
 	} else if(req.body.sequenceNumber == "3") {
 		updateBooking = {
 			$set: {
-				notification: notificationFor,
+				notification: {
+					for: notificationFor,
+					message: req.body.notificationMessage
+				},
 				'scenario.message3': {
 					code: req.body.code,
 					description_patient: req.body.descriptionPatient,
@@ -409,7 +438,10 @@ router.put('/scenario/:id', (req, res) => {
 	} else if(req.body.sequenceNumber == "4") {
 		updateBooking = {
 			$set: {
-				notification: notificationFor,
+				notification: {
+					for: notificationFor,
+					message: req.body.notificationMessage
+				},
 				'scenario.message4': {
 					code: req.body.code,
 					description_patient: req.body.descriptionPatient,
@@ -422,7 +454,10 @@ router.put('/scenario/:id', (req, res) => {
 	} else if(req.body.sequenceNumber == "5") {
 		updateBooking = {
 			$set: {
-				notification: notificationFor,
+				notification: {
+					for: notificationFor,
+					message: req.body.notificationMessage
+				},
 				'scenario.message5': {
 					code: req.body.code,
 					description_patient: req.body.descriptionPatient,
@@ -435,7 +470,10 @@ router.put('/scenario/:id', (req, res) => {
 	} else if(req.body.sequenceNumber == "6") {
 		updateBooking = {
 			$set: {
-				notification: notificationFor,
+				notification: {
+					for: notificationFor,
+					message: req.body.notificationMessage
+				},
 				'scenario.message6': {
 					code: req.body.code,
 					description_patient: req.body.descriptionPatient,
@@ -448,7 +486,10 @@ router.put('/scenario/:id', (req, res) => {
 	} else if(req.body.sequenceNumber == "7") {
 		updateBooking = {
 			$set: {
-				notification: notificationFor,
+				notification: {
+					for: notificationFor,
+					message: req.body.notificationMessage
+				},
 				'scenario.message7': {
 					code: req.body.code,
 					description_patient: req.body.descriptionPatient,
@@ -461,7 +502,10 @@ router.put('/scenario/:id', (req, res) => {
 	} else if(req.body.sequenceNumber == "8") {
 		updateBooking = {
 			$set: {
-				notification: notificationFor,
+				notification: {
+					for: notificationFor,
+					message: req.body.notificationMessage
+				},
 				'scenario.message8': {
 					code: req.body.code,
 					description_patient: req.body.descriptionPatient,
@@ -474,7 +518,10 @@ router.put('/scenario/:id', (req, res) => {
 	} else if(req.body.sequenceNumber == "9") {
 		updateBooking = {
 			$set: {
-				notification: notificationFor,
+				notification: {
+					for: notificationFor,
+					message: req.body.notificationMessage
+				},
 				'scenario.message9': {
 					code: req.body.code,
 					description_patient: req.body.descriptionPatient,
@@ -487,7 +534,10 @@ router.put('/scenario/:id', (req, res) => {
 	} else if(req.body.sequenceNumber == "10") {
 		updateBooking = {
 			$set: {
-				notification: notificationFor,
+				notification: {
+					for: notificationFor,
+					message: req.body.notificationMessage
+				},
 				'scenario.message10': {
 					code: req.body.code,
 					description_patient: req.body.descriptionPatient,
@@ -500,7 +550,10 @@ router.put('/scenario/:id', (req, res) => {
 	} else if(req.body.sequenceNumber == "11") {
 		updateBooking = {
 			$set: {
-				notification: notificationFor,
+				notification: {
+					for: notificationFor,
+					message: req.body.notificationMessage
+				},
 				'scenario.message11': {
 					code: req.body.code,
 					description_patient: req.body.descriptionPatient,
@@ -513,7 +566,10 @@ router.put('/scenario/:id', (req, res) => {
 	} else if(req.body.sequenceNumber == "12") {
 		updateBooking = {
 			$set: {
-				notification: notificationFor,
+				notification: {
+					for: notificationFor,
+					message: req.body.notificationMessage
+				},
 				'scenario.message12': {
 					code: req.body.code,
 					description_patient: req.body.descriptionPatient,
