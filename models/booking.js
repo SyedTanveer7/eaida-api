@@ -52,17 +52,15 @@ const BookingSchema = new mongoose.Schema({
         lng: {
             type: String,
         },
-        createdAt: {
-            type: Date,
-            default: Date.now
-        }
+        createdAt: Date
     },
     notification: {
         for: {
             type: String,
             enum: ['Patient', 'Specialist', 'None']
         },
-        message: String
+        message: String,
+        createdAt: Date
     },
     reportID: {
         type: mongoose.Schema.Types.ObjectId,

@@ -392,7 +392,8 @@ router.put('/scenario/:id', (req, res) => {
 			$set: {
 				notification: {
 					for: notificationFor,
-					message: req.body.notificationMessage
+					message: req.body.notificationMessage,
+					createdAt: moment()
 				},
 				'scenario.message1': {
 					code: req.body.code,
@@ -408,7 +409,8 @@ router.put('/scenario/:id', (req, res) => {
 			$set: {
 				notification: {
 					for: notificationFor,
-					message: req.body.notificationMessage
+					message: req.body.notificationMessage,
+					createdAt: moment()
 				},
 				'scenario.message2': {
 					code: req.body.code,
@@ -424,7 +426,8 @@ router.put('/scenario/:id', (req, res) => {
 			$set: {
 				notification: {
 					for: notificationFor,
-					message: req.body.notificationMessage
+					message: req.body.notificationMessage,
+					createdAt: moment()
 				},
 				'scenario.message3': {
 					code: req.body.code,
@@ -440,7 +443,8 @@ router.put('/scenario/:id', (req, res) => {
 			$set: {
 				notification: {
 					for: notificationFor,
-					message: req.body.notificationMessage
+					message: req.body.notificationMessage,
+					createdAt: moment()
 				},
 				'scenario.message4': {
 					code: req.body.code,
@@ -456,7 +460,8 @@ router.put('/scenario/:id', (req, res) => {
 			$set: {
 				notification: {
 					for: notificationFor,
-					message: req.body.notificationMessage
+					message: req.body.notificationMessage,
+					createdAt: moment()
 				},
 				'scenario.message5': {
 					code: req.body.code,
@@ -472,7 +477,8 @@ router.put('/scenario/:id', (req, res) => {
 			$set: {
 				notification: {
 					for: notificationFor,
-					message: req.body.notificationMessage
+					message: req.body.notificationMessage,
+					createdAt: moment()
 				},
 				'scenario.message6': {
 					code: req.body.code,
@@ -488,7 +494,8 @@ router.put('/scenario/:id', (req, res) => {
 			$set: {
 				notification: {
 					for: notificationFor,
-					message: req.body.notificationMessage
+					message: req.body.notificationMessage,
+					createdAt: moment()
 				},
 				'scenario.message7': {
 					code: req.body.code,
@@ -504,7 +511,8 @@ router.put('/scenario/:id', (req, res) => {
 			$set: {
 				notification: {
 					for: notificationFor,
-					message: req.body.notificationMessage
+					message: req.body.notificationMessage,
+					createdAt: moment()
 				},
 				'scenario.message8': {
 					code: req.body.code,
@@ -520,7 +528,8 @@ router.put('/scenario/:id', (req, res) => {
 			$set: {
 				notification: {
 					for: notificationFor,
-					message: req.body.notificationMessage
+					message: req.body.notificationMessage,
+					createdAt: moment()
 				},
 				'scenario.message9': {
 					code: req.body.code,
@@ -536,7 +545,8 @@ router.put('/scenario/:id', (req, res) => {
 			$set: {
 				notification: {
 					for: notificationFor,
-					message: req.body.notificationMessage
+					message: req.body.notificationMessage,
+					createdAt: moment()
 				},
 				'scenario.message10': {
 					code: req.body.code,
@@ -552,7 +562,8 @@ router.put('/scenario/:id', (req, res) => {
 			$set: {
 				notification: {
 					for: notificationFor,
-					message: req.body.notificationMessage
+					message: req.body.notificationMessage,
+					createdAt: moment()
 				},
 				'scenario.message11': {
 					code: req.body.code,
@@ -568,7 +579,8 @@ router.put('/scenario/:id', (req, res) => {
 			$set: {
 				notification: {
 					for: notificationFor,
-					message: req.body.notificationMessage
+					message: req.body.notificationMessage,
+					createdAt: moment()
 				},
 				'scenario.message12': {
 					code: req.body.code,
