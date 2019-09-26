@@ -21,7 +21,13 @@ const stripeRoutesV1 = require("./routes/v1/stripe");
 
 const port = process.env.PORT || 3000;
 
-mongoose.connect("mongodb://127.0.0.1:27017/eiada-dev", {
+// mongoose.connect("mongodb://127.0.0.1:27017/eiada-dev", {
+//     useNewUrlParser: true,
+//     useFindAndModify: false,
+//     useCreateIndex: true
+// });
+
+mongoose.connect("mongodb://eiadadev:patrick22@ds343127.mlab.com:43127/eiada-dev", {
     useNewUrlParser: true,
     useFindAndModify: false,
     useCreateIndex: true
