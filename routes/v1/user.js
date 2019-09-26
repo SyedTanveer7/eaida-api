@@ -533,7 +533,7 @@ router.post('/forgot', function (req, res, next) {
 			var smtpTransport = nodemailer.createTransport({
 				service: 'Gmail',
 				auth: {
-					user: 'jepoyyy0225@gmail.com',
+					user: 'jp.madrigal07@gmail.com',
 					pass: '@Patrick22'
 				}
 			});
