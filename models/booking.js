@@ -41,8 +41,7 @@ const BookingSchema = new mongoose.Schema({
             type: String,
         },
         createdAt: {
-            type: Date,
-            default: Date.now
+            type: Date
         }
     },
     specialistLocation: {
@@ -68,7 +67,7 @@ const BookingSchema = new mongoose.Schema({
     },
     reviewID: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Review"
+        ref: "Reviews"
     },
     scenario: {
         message1: {
@@ -283,6 +282,20 @@ const BookingSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: Date.now
+    },
+    removedAt: {
+        patient: {
+            type: Date
+        },
+        specialist: {
+            type: Date
+        }
+    },
+    cancelledAt: {
+        type: Date
+    },
+    declinedAt: {
+        type: Date
     },
     deleteAt: {
         type: Date

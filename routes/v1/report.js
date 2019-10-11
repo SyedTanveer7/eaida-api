@@ -17,7 +17,7 @@ router.get("/", (req, res) => {
 	// Needs to have userID
 	req.query.cancelledAt = {$exists: false};
 	req.query.deleteAt = {$exists: false};
-	Report.find(req.query).populate('patientID').populate({path : 'specialistID', populate : {path : 'specialist.info'}}).sort({createdAt: -1}).exec((err, allReport) => {
+	Report.find(req.query).populate('patientID').populate('specialistID').sort({createdAt: -1}).exec((err, allReport) => {
 		if (err) {
 			res.json({
 				error: true,
@@ -28,6 +28,8 @@ router.get("/", (req, res) => {
 				error: false,
 				message: allReport
 			})
+
+			console.log(allReport);
 		}
 	});
 });

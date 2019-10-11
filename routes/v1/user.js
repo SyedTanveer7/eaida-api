@@ -50,17 +50,23 @@ router.post("/session", [
 				})
 			} else {
 				if (user.length > 0) {
-					console.log(user);
+					var approveStatus = false;
+					if(typeof user[0].approvedAt !== 'undefined') {
+						approveStatus = true;
+					}
 					jwt.sign({
 						userID: user[0]._id,
-						deviceName: 'vivo1089'
+						deviceName: 'vivo1089',
+						userRole: user[0].roles
 					}, 'secretKey', {
 						expiresIn: '7d'
 					}, (err, token) => {
 						res.json({
 							error: false,
+							message: 'Successfully logged in!',
 							userID: user[0]._id,
 							userRole: user[0].roles,
+							approved: approveStatus,
 							token
 						});
 					});
@@ -78,9 +84,30 @@ router.post("/session", [
 // USER ENDPOINTS
 
 router.get("/", (req, res) => {
+	if(typeof req.query.count !== 'undefined') {
+		if(req.query.count == "all") {
+			req.query.$or = [ {roles: { $ne: 'Administrator' }}, {roles: 'Patient'} ]
+		}
+		delete req.query.count;
+	}
+	if(typeof req.query.roles !== 'undefined') {
+		if(req.query.roles == "Specialist") {
+			delete req.query.roles;
+			req.query.$and = [ {roles: { $ne: 'Administrator' }}, {roles: { $ne: 'Patient' }} ]
+		}
+	}
+	if(typeof req.query.registeredAccounts !== 'undefined') {
+		req.query.roles = { $ne: 'Administrator' }
+		delete req.query.registeredAccounts;
+	}
+	if(typeof req.query.search !== 'undefined') {
+		req.query.$or = [ {firstName: { $regex: req.query.search, $options: 'i' }}, {middleName: { $regex: req.query.search, $options: 'i' }}, {lastName: { $regex: req.query.search, $options: 'i' }}, {username: { $regex: req.query.search, $options: 'i' }}, {email: { $regex: req.query.search, $options: 'i' }} ]
+		delete req.query.search;
+	}
 	req.query.deleteAt = {
 		$exists: false
 	};
+	console.log(req.query)
 	User.find(req.query).populate({ path: 'specialist.info' }).populate({ path: 'specialist.weeklySchedule' }).exec((err, allUser) => {
 		if (err) {
 			res.json({
@@ -91,8 +118,10 @@ router.get("/", (req, res) => {
 			res.json({
 				error: false,
 				message: allUser
-				// authData: req.authData
+				
 			})
+
+			console.log(allUser);
 		}
 	});
 });
@@ -136,7 +165,7 @@ router.post("/", [
 		birthDate: moment(req.body.birthDate).format('MM-DD-YYYY hh:mm:ss'),
 		roles: req.body.roles
 	});
-
+	console.log(req.body.roles);
 	var errorsMessage = '';
 	var errors = validationResult(req);
 	var errorsArray = errors.array();
@@ -184,7 +213,8 @@ router.put('/:id', [
 		lastName: req.body.lastName,
 		gender: req.body.gender,
 		birthDate: moment(req.body.birthDate).format('MM-DD-YYYY hh:mm:ss'),
-		middleName: req.body.middleName
+		middleName: req.body.middleName,
+		roles: req.body.roles
 	};
 	var errorsMessage = '';
 	var errors = validationResult(req);
@@ -678,5 +708,96 @@ function checkFileType(file, cb) {
 		cb('Error: Images Only!');
 	}
 }
+
+router.put('/loginstatus/:id', (req, res) => {
+	var updateUser = {
+		loginStatus: req.body.loginStatus
+	};
+	User.update({ _id: req.params.id }, updateUser, (err, updatedUser) => {
+		if (err) {
+			res.json({
+				error: true,
+				message: err
+			})
+		} else {
+			res.json({
+			error: false,
+			message: 'Login status is set to '+req.body.loginStatus+'.'
+			})
+		}
+	})
+});
+
+
+router.put('/approve/:id', (req, res) => {
+	if(req.body.status == "approve") {
+		var updateUser = {
+			approvedAt: moment()
+		};
+	} else if(req.body.status == "disapprove") {
+		var updateUser = {
+			$unset: { approvedAt: "" }
+		};
+	}
+	User.update({ _id: req.params.id }, updateUser, (err, updatedUser) => {
+		if (err) {
+			res.json({
+				error: true,
+				message: err
+			})
+		} else {
+			res.json({
+			error: false,
+			message: 'Successfully approved.'
+			})
+		}
+	})
+});
+
+router.put('/block/:id', (req, res) => {
+	if(req.body.status == "block") {
+		var updateUser = {
+			blockedAt: moment()
+		};
+	} else if(req.body.status == "unblock") {
+		var updateUser = {
+			$unset: { blockedAt: "" }
+		};
+	}
+	User.update({ _id: req.params.id }, updateUser, (err, updatedUser) => {
+		if (err) {
+			res.json({
+				error: true,
+				message: err
+			})
+		} else {
+			res.json({
+			error: false,
+			message: 'Successfully '+req.body.status+'.'
+			})
+		}
+	})
+});
+
+router.put('/balance/:id', (req, res) => {
+
+	var updateUser = {
+		$set: { 'specialist.availableBalance': req.body.availableBalance }
+	};
+	
+	User.update({ _id: req.params.id }, updateUser, (err, updatedUser) => {
+		if (err) {
+			res.json({
+				error: true,
+				message: err
+			})
+		} else {
+			res.json({
+			error: false,
+			message: 'Successfully updated available balance.'
+			})
+		}
+	})
+});
 
 module.exports = router;

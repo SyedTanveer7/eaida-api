@@ -15,8 +15,41 @@ const middleware = require('../../middleware');
 // SPECIALIST WEEKLY SCHEDULE ENDPOINTS
 
 router.get("/", (req, res) => {
+	if(typeof req.query.weekDay !== 'undefined') {
+		if(req.query.weekDay == "Monday") {
+			req.query = {
+				'monday.status': 'Available'
+			}
+		} else if(req.query.weekDay == "Tuesday") {
+			req.query = {
+				'tuesday.status': 'Available'
+			}
+		} else if(req.query.weekDay == "Wednesday") {
+			req.query = {
+				'wednesday.status': 'Available'
+			}
+		} else if(req.query.weekDay == "Thursday") {
+			req.query = {
+				'thursday.status': 'Available'
+			}
+		} else if(req.query.weekDay == "Friday") {
+			req.query = {
+				'friday.status': 'Available'
+			}
+		} else if(req.query.weekDay == "Saturday") {
+			req.query = {
+				'saturday.status': 'Available'
+			}
+		} else if(req.query.weekDay == "Sunday") {
+			req.query = {
+				'sunday.status': 'Available'
+			}
+		}
+		delete req.query.weekDay;
+	}
 	// Needs to have userID
 	req.query.deleteAt = {$exists: false};
+	console.log(req.query);
 	SpecialistWeeklySchedule.find(req.query).populate({path : 'specialistID', populate : {path : 'specialist.info'}}).sort({createdAt: -1}).exec((err, allSpecialistWeeklySchedule) => {
 		if (err) {
 			res.json({
@@ -135,7 +168,7 @@ router.post("/", [
 					message: err
 				})
 			} else {
-				User.update({ _id: req.body.userID} , { $set: { 'specialist.weeklySchedule' : specialistWeeklySchedule._id  } } , (err, updateUser) => {
+				User.updateOne({ _id: req.body.specialistID} , { $set: { 'specialist.weeklySchedule' : specialistWeeklySchedule._id  } }, {upsert: true} , (err, updateUser) => {
 					if (err) {
 						res.json({
 							error: true,

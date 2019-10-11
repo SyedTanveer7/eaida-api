@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router({
 	mergeParams: true
 });
+const Reviews = require("../../models/reviews");
+const Report = require("../../models/report");
 const Booking = require("../../models/booking");
 const {
 	check,
@@ -14,9 +16,79 @@ const middleware = require('../../middleware');
 // BOOKING ENDPOINTS
 
 router.get("/", (req, res) => {
+	if(typeof req.query.activeCount !== 'undefined') {
+		if(req.query.activeCount == "all") {
+			req.query.$or = [ {reportID: {$exists: false} }, {reviewID: {$exists: false}} ]
+		}
+		delete req.query.activeCount;
+	}
+
+	if(typeof req.query.removedAt !== 'undefined') {
+		if(req.query.removedAt == "booking") {
+			delete req.query.removedAt;
+			if(typeof req.query.patientID !== 'undefined') {
+				req.query = {'removedAt.patient': {$exists: false} }
+			} else if(typeof req.query.specialistID !== 'undefined') {
+				req.query = {'removedAt.specialist': {$exists: false} }
+			}
+		} else if(req.query.removedAt == "history") {
+			delete req.query.removedAt;
+			if(typeof req.query.patientID !== 'undefined') {
+				req.query = {'removedAt.patient': {$exists: true} }
+			} else if(typeof req.query.specialistID !== 'undefined') {
+				req.query = {'removedAt.specialist': {$exists: true} }
+			}
+		}
+	}
+
+	if(typeof req.query.bookingHistory !== 'undefined') {
+		if(req.query.bookingHistory == "all") {
+			
+		} else if(req.query.bookingHistory == "today") {
+			req.query.createdAt = { $gte: new Date(new Date() - 1 * 60 * 60 * 24 * 1000) }
+		} else if(req.query.bookingHistory == "week") {
+			req.query.createdAt = { $gte: new Date(new Date() - 7 * 60 * 60 * 24 * 1000) }
+		} else if(req.query.bookingHistory == "month") {
+			req.query.createdAt = { $gte: new Date(new Date() - 30 * 60 * 60 * 24 * 1000) }
+		}
+		delete req.query.bookingHistory;
+	}
+
+	if(typeof req.query.paymentHistory !== 'undefined') {
+		if(req.query.paymentHistory == "all") {
+			req.query.payment = {$exists: true};
+		} else if(req.query.paymentHistory == "today") {
+			req.query.$and = [{payment: {$exists: true}}, {createdAt: {$gte: new Date(new Date() - 1 * 60 * 60 * 24 * 1000)}}]
+		} else if(req.query.paymentHistory == "week") {
+			req.query.$and = [{payment: {$exists: true}}, {createdAt: {$gte: new Date(new Date() - 7 * 60 * 60 * 24 * 1000)}}]
+		} else if(req.query.paymentHistory == "month") {
+			req.query.$and = [{payment: {$exists: true}}, {createdAt: {$gte: new Date(new Date() - 30 * 60 * 60 * 24 * 1000)}}]
+		} 
+		delete req.query.paymentHistory;
+	}
+	
+	if(typeof req.query.weeklyTransactionCount !== 'undefined') {
+		if(req.query.weeklyTransactionCount == "all") {
+			req.query.createdAt = { $gte: new Date(new Date() - 7 * 60 * 60 * 24 * 1000) }
+		}
+		delete req.query.weeklyTransactionCount;
+	}
+
+	if(typeof req.query.monthlyTransactionCount !== 'undefined') {
+		if(req.query.monthlyTransactionCount == "all") {
+			req.query.createdAt = { $gte: new Date(new Date() - 30 * 60 * 60 * 24 * 1000) }
+		}
+		delete req.query.monthlyTransactionCount;
+	}
+
+	if(typeof req.query.textQuery !== 'undefined') {
+		req.query.$or = [ {'patientID.firstName': {$regex : req.query.textQuery} }, {'patientID.middleName': {$regex : req.query.textQuery} }, {'patientID.firstName': {$regex : req.query.textQuery} } ]
+		delete req.query.textQuery;
+	}
+
 	req.query.deleteAt = {$exists: false};
 	console.log(req.query);
-	Booking.find(req.query).populate('patientID').populate('addressID').populate({path : 'specialistID', populate : {path : 'specialist.info'}}).populate({path : 'specialistID', populate : {path : 'specialist.weeklySchedule'}}).sort({createdAt: -1}).exec((err, allBooking) => {
+	Booking.find(req.query).populate('reviewID').populate('reportID').populate('patientID').populate('addressID').populate({path : 'specialistID', populate : {path : 'specialist.info'}}).populate({path : 'specialistID', populate : {path : 'specialist.weeklySchedule'}}).sort({createdAt: -1}).exec((err, allBooking) => {
 		if (err) {
 			res.json({
 				error: true,
@@ -83,7 +155,9 @@ router.post("/", [
 		bookingDate: moment(req.body.bookingDate).format('MM-DD-YYYY hh:mm:ss'),
 		notification: {
 			for: "Specialist",
-			message: "You have new booking request from " + req.body.accountOwnerName + "."
+			message: "You have new booking request from " + req.body.accountOwnerName + ".",
+			
+			createdAt: moment()
 		},
 		scenario: {
 			message1: {
@@ -200,11 +274,7 @@ router.delete('/:id', (req, res) => {
 
 router.put('/cancel/:id', (req, res) => {
 	var cancelBooking = {
-		status: {
-			label: 'Cancelled',
-			triggeredBy: req.body.triggeredBy,
-			triggeredAt: moment()
-		}
+		cancelledAt: moment()
 	};
 	Booking.findByIdAndUpdate(req.params.id, cancelBooking, (err, cancelBooking) => {
 		if (err) {
@@ -215,7 +285,7 @@ router.put('/cancel/:id', (req, res) => {
 		} else {
 			res.json({
 			error: false,
-			message: 'Booking Cancelled!'
+			message: 'Booking cancelled.'
 			})
 		}
 	})
@@ -223,12 +293,7 @@ router.put('/cancel/:id', (req, res) => {
 
 router.put('/decline/:id', (req, res) => {
 	var declineBooking = {
-		status: {
-			label: 'Declined',
-			triggeredBy: req.body.triggeredBy,
-			triggeredAt: moment(),
-			declineReason: req.body.declineReason
-		}
+		declinedAt: moment()
 	};
 	Booking.findByIdAndUpdate(req.params.id, declineBooking, (err, declineBooking) => {
 		if (err) {
@@ -239,7 +304,7 @@ router.put('/decline/:id', (req, res) => {
 		} else {
 			res.json({
 				error: false,
-				message: 'Booking declined! Booking moved to Booking History.'
+				message: 'Booking declined.'
 			})
 		}
 	})
@@ -285,7 +350,7 @@ router.put('/done/:id', (req, res) => {
 		} else {
 			res.json({
 				error: false,
-				message: 'Booking Done.'
+				message: 'Booking done.'
 			})
 		}
 	})
@@ -676,5 +741,70 @@ router.put('/notification/:id', (req, res) => {
 		}
 	})
 });
+
+router.get('/search/:search', (req, res) => {
+	Booking.aggregate([
+
+		// Join with user_info table
+		{
+			$lookup: {
+				from: "User", // other table name
+				localField: "patientID", // name of users table field
+				foreignField: "_id", // name of userinfo table field
+				as: "user" // alias for userinfo table
+			}
+		},
+		{
+			$unwind: "$user"
+		}, // $unwind used for getting data in object or for one record only
+		{ 
+			$match: { 'User.firstName': { $eq: req.params.search } }
+		}
+	]).exec((err, result) => {
+		if (err) {
+			res.json({
+				error: true,
+				message: err
+			})
+		} else {
+			res.json({
+				error: false,
+				message: result
+			})
+		};
+	});
+});
+
+router.put('/remove/:id', (req, res) => {
+	var updateBooking;
+	if(req.body.role == "Patient") {
+		updateBooking = {
+			removedAt: {
+				patient: moment()
+			}
+		};
+	} else {
+		updateBooking = {
+			removedAt: {
+				specialist: moment()
+			}
+		};
+	}
+
+	Booking.findByIdAndUpdate(req.params.id, updateBooking, (err, updatedBooking) => {
+		if (err) {
+			res.json({
+				error: true,
+				message: err
+			})
+		} else {
+			res.json({
+			error: false,
+			message: 'Booking report remove!'
+			})
+		}
+	})
+});
+
 
 module.exports = router;

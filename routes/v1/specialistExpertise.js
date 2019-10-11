@@ -16,7 +16,7 @@ const middleware = require('../../middleware');
 router.get("/", (req, res) => {
 	// Needs to have userID
 	req.query.deleteAt = {$exists: false};
-	SpecialistExpertise.find(req.query).populate({path : 'specialistID', populate : {path : 'specialist.info'}}).populate({path : 'specialistID', populate : {path : 'specialist.weeklySchedule'}}).sort({createdAt: -1}).exec((err, allSpecialistExpertise) => {
+	SpecialistExpertise.find(req.query).populate('specialistID').populate({path : 'specialistID', populate : {path : 'specialist.info'}}).populate({path : 'specialistID', populate : {path : 'specialist.weeklySchedule'}}).sort({createdAt: -1}).exec((err, allSpecialistExpertise) => {
 		if (err) {
 			res.json({
 				error: true,
@@ -27,6 +27,7 @@ router.get("/", (req, res) => {
 				error: false,
 				message: allSpecialistExpertise
 			})
+
 		}
 	});
 });

@@ -50,7 +50,7 @@ const UserSchema = new mongoose.Schema({
     },
 	roles: {
         type: String,
-        enum: ['Patient', 'Cardiologist', 'Nurse', 'Physical Therapist', 'Veterinarian', 'Caregiver', 'Dermatologist', 'Ent', 'Family Medicine', 'Gastroenterologist', 'General Practitioner', 'General Surgeon', 'Internal Medicine', 'Medtech', 'Midwife', 'Nephrologist', 'Neurologist', 'Nursing Aid', 'Obstetricts Gynecology', 'Ocupational Medicine', 'Ophthalmologist', 'Orthopedic Surgeon', 'Pediatrician', 'Phlebotomist', 'Psychiatrist', 'Pulmonologist', 'Rehab Med', 'Urologist'],
+        enum: ['Administrator', 'Patient', 'Cardiologist', 'Nurse', 'Physical Therapist', 'Veterinarian', 'Caregiver', 'Dermatologist', 'Ent', 'Family Medicine', 'Gastroenterologist', 'General Practitioner', 'General Surgeon', 'Internal Medicine', 'Medtech', 'Midwife', 'Nephrologist', 'Neurologist', 'Nursing Aid', 'Obstetricts Gynecology', 'Ocupational Medicine', 'Ophthalmologist', 'Orthopedic Surgeon', 'Pediatrician', 'Phlebotomist', 'Psychiatrist', 'Pulmonologist', 'Rehab Med', 'Urologist'],
         default: 'Patient'
     },
     imgURL: {
@@ -98,6 +98,9 @@ const UserSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "SpecialistWeeklySchedule"
         },
+        availableBalance: {
+            type: String
+        },
         reviewStarCount: {
             type: String,
             default: '0.0'
@@ -105,6 +108,7 @@ const UserSchema = new mongoose.Schema({
     },
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    loginStatus: String,
     createdAt: {
         type: Date,
         default: Date.now
@@ -112,6 +116,12 @@ const UserSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: Date.now
+    },
+    approvedAt: {
+        type: Date
+    },
+    blockedAt: {
+        type: Date
     },
     deleteAt: {
         type: Date

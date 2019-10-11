@@ -10,16 +10,16 @@ const bookingRoutesV1 = require("./routes/v1/booking");
 const specialistRoutesV1 = require("./routes/v1/specialist");
 const reviewsRoutesV1 = require("./routes/v1/reviews");
 const reviewsBlackListedJWTV1 = require("./routes/v1/blacklistedJWT");
-const braintreeV1 = require("./routes/v1/braintree");
 const reportRoutesV1 = require("./routes/v1/report");
 const caseRoutesV1 = require("./routes/v1/case");
 const specialistExpertiseRoutesV1 = require("./routes/v1/specialistExpertise");
 const familyMemberRoutesV1 = require("./routes/v1/familyMember");
 const specialistWeeklyScheduleRoutesV1 = require("./routes/v1/specialistWeeklySchedule");
 const cardDetailsRoutesV1 = require("./routes/v1/cardDetails");
+const withdrawRequestRoutesV1 = require("./routes/v1/withdrawRequest");
 const stripeRoutesV1 = require("./routes/v1/stripe");
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 // mongoose.connect("mongodb://127.0.0.1:27017/eiada-dev", {
 //     useNewUrlParser: true,
@@ -57,19 +57,19 @@ app.use("/api/v1/booking", bookingRoutesV1);
 app.use("/api/v1/specialist", specialistRoutesV1);
 app.use("/api/v1/reviews", reviewsRoutesV1);
 app.use("/api/v1/blacklistedjwt", reviewsBlackListedJWTV1);
-app.use("/api/v1/braintree", braintreeV1);
 app.use("/api/v1/report", reportRoutesV1);
 app.use("/api/v1/case", caseRoutesV1);
 app.use("/api/v1/specialistexpertise", specialistExpertiseRoutesV1);
 app.use("/api/v1/familymember", familyMemberRoutesV1);
 app.use("/api/v1/specialistweeklyschedule", specialistWeeklyScheduleRoutesV1);
 app.use("/api/v1/carddetails", cardDetailsRoutesV1);
+app.use("/api/v1/withdrawrequests", withdrawRequestRoutesV1);
 app.use("/api/v1/stripe", stripeRoutesV1);
 
-app.get('*', (req, res) => {
-    res.status(404).send("You don't have any permission to access this.");
+app.get('*', function(req, res){
+    res.status(404).send("Sorry! You don't have any permission to access this.");
 });
 
 app.listen(port, () => {
-    console.log("EIADA has Started in PORT 3000 http://localhost:3000/");
+    console.log("EIADA has Started in PORT 3000 http://localhost:5000/");
 });

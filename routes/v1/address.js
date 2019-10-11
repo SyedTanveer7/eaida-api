@@ -16,7 +16,7 @@ const middleware = require('../../middleware');
 router.get("/", (req, res) => {
 	// Needs to have userID
 	req.query.deleteAt = {$exists: false};
-	Address.find(req.query).sort( { _id: -1 } ).exec((err, allAddress) => {
+	Address.find(req.query).populate('userID').sort( { _id: -1 } ).exec((err, allAddress) => {
 		if (err) {
 			res.json({
                 error: true,
