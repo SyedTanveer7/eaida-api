@@ -27,7 +27,7 @@ const port = process.env.PORT || 5000;
 //     useCreateIndex: true
 // });
 
-mongoose.connect("mongodb://eiadadev:patrick22@ds343127.mlab.com:43127/eiada-dev", {
+mongoose.connect("mongodb+srv://test:test@cluster0-wfbxr.mongodb.net/test?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useFindAndModify: false,
     useCreateIndex: true
